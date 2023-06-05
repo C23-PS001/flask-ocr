@@ -1,2 +1,2 @@
 runtime: python39
-service: ocr2
+entrypoint: uwsgi --http-socket :$PORT --wsgi-file ocr.py --callable app --master --processes 1 --threads 2
