@@ -34,7 +34,7 @@ def CariTTL(X):
         return extracted_format
   return ""
 
-app = Flask()
+app = Flask(__name__)
 
 reader = easyocr.Reader(['id'])
 @app.route('/absen',methods=['POST'])
@@ -79,4 +79,5 @@ def delete(filenames):
     blob.delete()
     return 'Success'    
 
-app.run('0.0.0.0', 1891, debug=True)
+if __name__ == 'ocr':
+    app.run('0.0.0.0', 1891, debug=True)
