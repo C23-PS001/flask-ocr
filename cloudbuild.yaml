@@ -1,0 +1,21 @@
+steps:
+  # Build the Flask application
+  - name: python:3.9.6
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+        pip install flask-api
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'app'
+      - 'deploy'
+      - '--project=nyobaaja'
+      - 'app.yaml'
+      - '--stop-previous-version'
+    timeout: "1600s"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
