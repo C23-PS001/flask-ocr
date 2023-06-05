@@ -12,8 +12,6 @@ steps:
     args:
       - 'app'
       - 'deploy'
-      - '--project=nyobaaja'
-      - 'app.yaml'
       - '--stop-previous-version'
     timeout: "1600s"
 
