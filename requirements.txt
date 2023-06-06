@@ -1,5 +1,5 @@
 flask==2.3.1
-gunicorn
+gunicorn==20.1.0
 numpy==1.23.5
 easyocr==1.7.0
 Pillow==9.5.0
