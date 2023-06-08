@@ -11,4 +11,4 @@ COPY . /app
 EXPOSE 8080
 ENV PORT 8080
 
-CMD exec gunicorn --bind :$PORT main:app --workers 1 --threads 1 --timeout 60
+CMD exec gunicorn --bind :$PORT main:app --workers 1 --threads 1 --timeout 1600
