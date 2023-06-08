@@ -6,6 +6,7 @@ import easyocr
 from google.cloud import storage
 from PIL import Image
 from io import BytesIO
+from flask_cors import CORS
 import os
 import re
 
@@ -35,6 +36,7 @@ def CariTTL(X):
   return ""
 
 app = Flask(__name__)
+CORS(app)
 
 reader = easyocr.Reader(['id'])
 @app.route('/absen',methods=['POST'])
