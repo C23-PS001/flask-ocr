@@ -54,13 +54,12 @@ def upload():
     credentials_path = r"nyobaaja-973da4b3851c.json"
     client = storage.Client.from_service_account_json(credentials_path)
     file= request.files['images']
-    file.save(file.filename)
+    # file.save(file.filename)
     bucket_name = "upload_foto"
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob('fotoktp/{}'.format(file.filename))
-    blob.upload_from_filename(file.filename)
+    blob.upload_from_file(file)
     linkFoto = blob.public_url
-    os.remove(file.filename)
     test = getOCRData(linkFoto)
     return test
 
