@@ -7,6 +7,7 @@ from google.cloud import storage
 from PIL import Image
 from io import BytesIO
 from flask_cors import CORS
+from urllib.parse import unquote
 import os
 import re
 
@@ -39,17 +40,14 @@ app = Flask(__name__)
 CORS(app)
 
 reader = easyocr.Reader(['id'])
-# @app.route('/absen',methods=['POST'])
-def ilham(params):    
+def getOCRData(params):    
     response = requests.get(params)
     image = Image.open(BytesIO(response.content))
     results = reader.readtext(image)
     List= []
     for result in results:
         List.append(result[1])
-    #print(image_list[:20])
-    # TTL_SPLIT= CariTTL(List)
-    return json.dumps({'NIK':CariNIK(List),'Nama':CariNama(List),'Tgl Lahir':CariTTL(List)})
+    return json.dumps({'NIK':CariNIK(List),'Nama':CariNama(List),'Tgl Lahir':CariTTL(List), 'Link Photo':params})
 
 @app.route('/masuk',methods=['POST'])
 def upload():
@@ -58,28 +56,26 @@ def upload():
     file= request.files['images']
     file.save(file.filename)
     bucket_name = "upload_foto"
-    # Get the bucket and create a Blob object
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob('fotoktp/{}'.format(file.filename))
-    # Upload the file to Cloud Storage
     blob.upload_from_filename(file.filename)
-    # Get the public URL of the file
-    videoUrl = blob.public_url
+    linkFoto = blob.public_url
     os.remove(file.filename)
-    test = ilham(videoUrl)
-    # response = delete(file.filename)
+    test = getOCRData(linkFoto)
     return test
 
-# @app.route('/keluar',methods=['POST'])
-# def delete(filenames):
-#     credentials_path = r"nyobaaja-973da4b3851c.json"
-#     client = storage.Client.from_service_account_json(credentials_path)
-#     bucket_name = "upload_foto"
-#     # Get the bucket and create a Blob object
-#     bucket = client.get_bucket(bucket_name)
-#     blob = bucket.blob('fotoktp/{}'.format(filenames))
-#     blob.delete()
-#     return 'Success'    
+@app.route('/keluar',methods=['POST'])
+def delete():
+    linkFoto = request.form.get('linkFoto')
+    credentials_path = r"nyobaaja-973da4b3851c.json"
+    client = storage.Client.from_service_account_json(credentials_path)
+    bucket_name = "upload_foto"
+    bucket = client.get_bucket(bucket_name)
+
+    filename = unquote(os.path.basename(linkFoto)) 
+    blob = bucket.blob('fotoktp/{}'.format(filename))
+    blob.delete()
+    return 'Success'    
 
 if __name__ == '__main__':
     app.run('0.0.0.0', 8080, debug=True)
