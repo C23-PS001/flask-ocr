@@ -1,15 +1,15 @@
-from flask import Flask, request, redirect, url_for
-import numpy as np
 import json
 import requests
 import easyocr
+import os
+import re
+
+from flask import Flask, request
 from google.cloud import storage
 from PIL import Image
 from io import BytesIO
 from flask_cors import CORS
 from urllib.parse import unquote
-import os
-import re
 
 def CariNIK(X):
   for i in X:
@@ -71,7 +71,6 @@ def delete():
     client = storage.Client.from_service_account_json(credentials_path)
     bucket_name = "upload_foto"
     bucket = client.get_bucket(bucket_name)
-
     filename = unquote(os.path.basename(linkFoto)) 
     blob = bucket.blob('fotoktp/{}'.format(filename))
     blob.delete()
