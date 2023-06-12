@@ -6,6 +6,7 @@ import re
 
 from flask import Flask, request
 from google.cloud import storage
+from google.cloud import secretmanager
 from PIL import Image
 from io import BytesIO
 from flask_cors import CORS
@@ -47,15 +48,26 @@ def getOCRData(params):
     List= []
     for result in results:
         List.append(result[1])
-    return json.dumps({'NIK':CariNIK(List),'Nama':CariNama(List),'Tgl Lahir':CariTTL(List), 'Link Photo':params})
+    return json.dumps({
+      'error': 'false',
+      'message': 'Data berhasil diterima!',
+      'NIK':CariNIK(List),
+      'Nama':CariNama(List),
+      'Tgl Lahir':CariTTL(List), 
+      'Link Photo':params
+      })
 
 @app.route('/masuk',methods=['POST'])
 def upload():
-    credentials_path = r"nyobaaja-973da4b3851c.json"
-    client = storage.Client.from_service_account_json(credentials_path)
+  
+    gcpClient = secretmanager.SecretManagerServiceClient()
+    keysName = f"projects/872765504345/secrets/gcs-key/versions/latest"
+    response = gcpClient.access_secret_version(request={"name": keysName})
+    credentials = json.loads(response.payload.data.decode('UTF-8'))
+    client = storage.Client.from_service_account_info(credentials)
     file= request.files['images']
     file.save(file.filename)
-    bucket_name = "upload_foto"
+    bucket_name = "suara-kita"
     bucket = client.get_bucket(bucket_name)
     blob = bucket.blob('fotoktp/{}'.format(file.filename))
     blob.upload_from_filename(file.filename)
@@ -67,9 +79,12 @@ def upload():
 @app.route('/keluar',methods=['POST'])
 def delete():
     linkFoto = request.form.get('linkFoto')
-    credentials_path = r"nyobaaja-973da4b3851c.json"
-    client = storage.Client.from_service_account_json(credentials_path)
-    bucket_name = "upload_foto"
+    gcpClient = secretmanager.SecretManagerServiceClient()
+    keysName = f"projects/872765504345/secrets/gcs-key/versions/latest"
+    response = gcpClient.access_secret_version(request={"name": keysName})
+    credentials = json.loads(response.payload.data.decode('UTF-8'))
+    client = storage.Client.from_service_account_info(credentials)
+    bucket_name = "suara-kita"
     bucket = client.get_bucket(bucket_name)
     filename = unquote(os.path.basename(linkFoto)) 
     blob = bucket.blob('fotoktp/{}'.format(filename))
@@ -77,4 +92,4 @@ def delete():
     return 'Success'    
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 8080, debug=True)
+    app.run(debug=True)
