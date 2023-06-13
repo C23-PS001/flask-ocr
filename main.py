@@ -89,7 +89,10 @@ def delete():
     filename = unquote(os.path.basename(linkFoto)) 
     blob = bucket.blob('fotoktp/{}'.format(filename))
     blob.delete()
-    return 'Success'    
+    return json.dumps({
+      'error': 'false',
+      'message': 'Data berhasil dihapus!',
+      })
 
 if __name__ == '__main__':
     app.run(debug=True)
