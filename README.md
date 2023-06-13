@@ -19,4 +19,4 @@ ___
 
 # Disclaimer
 ___
-This part of program is far from perfect. The accuracy and reliability of OCR may vary depending on various factors, including the quality of the input image and more.
+This part of program is far from perfect. The accuracy and reliability of OCR may vary depending on various factors, including the quality of the input image.
